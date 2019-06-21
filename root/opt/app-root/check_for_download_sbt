@@ -1,0 +1,9 @@
+#!/bin/sh
+
+# If there is a zero-length spark tarball, find the version in the
+# name and download from github
+if ! [ -s "$1" ]; then
+    sbt=$(basename $1)
+    version=$(echo $sbt | cut -d '-' -f2 | sed 's/.tgz//')
+    wget https://bintray.com/sbt/native-packages/download_file?file_path=sbt%2F$version%2F$sbt -O $1
+fi

@@ -1,0 +1,116 @@
+# This image provides a Scala 2.11.8 environment you can use to run your Scala
+# This image provides a Scala 2.11.8 environment you can use to run your Scala
+# Copyright 2017 Red Hat
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+#
+# ------------------------------------------------------------------------
+#
+# This is a Dockerfile for the radanalyticsio/openshift-spark:2.4-latest image.
+
+FROM centos:latest
+
+USER root
+
+# Install required RPMs and ensure that the packages were installed
+RUN yum install -y java-1.8.0-openjdk wget \
+    && yum clean all && rm -rf /var/cache/yum \
+    && rpm -q java-1.8.0-openjdk wget
+
+
+# Add all artifacts to the /tmp/artifacts
+# directory
+COPY spark-2.4.0-bin-hadoop2.7.tgz /tmp/artifacts/
+COPY sbt-0.13.13.tgz /tmp/artifacts/
+COPY scala-2.11.8.tgz /tmp/artifacts/
+
+# Environment variables
+ENV \
+    JBOSS_IMAGE_NAME="radanalyticsio/openshift-spark" \
+    JBOSS_IMAGE_VERSION="2.4-latest" \
+    PATH="/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/opt/spark/bin" \
+    SCL_ENABLE_CMD="scl enable rh-python36" \
+    SPARK_HOME="/opt/spark" \
+    SPARK_INSTALL="/opt/spark-distro" \
+    STI_SCRIPTS_PATH="/usr/libexec/s2i" \ 
+    SCALA_VERSION=2.11.8 \
+    PATH=$HOME/.local/bin:/opt/scala/bin:/opt/sbt/bin:$PATH
+
+
+
+# Labels
+LABEL \
+      io.cekit.version="2.2.7"  \
+      io.openshift.s2i.scripts-url="image:///usr/libexec/s2i"  \
+      maintainer="Maria A. <macosta@fnal.gov>"  \
+      name="mapsacosta/openshift-spark"  \
+      org.concrt.version="2.2.7"  \
+      sparkversion="2.4.0"  \
+      version="2.4-latest" 
+
+# Add scripts used to configure the image
+COPY modules /tmp/scripts
+
+# Copy extra files to the image.
+COPY ./root/ /
+
+# Custom scripts
+USER root
+RUN [ "bash", "-x", "/tmp/scripts/common/install" ]
+
+USER root
+RUN [ "bash", "-x", "/tmp/scripts/metrics/install" ]
+
+USER root
+RUN [ "bash", "-x", "/tmp/scripts/spark/install" ]
+
+USER root
+RUN [ "bash", "-x", "/tmp/scripts/s2i/install" ]
+
+USER root
+RUN [ "bash", "-x", "/tmp/scripts/python36/install" ]
+
+USER root
+RUN bash -x /opt/app-root/check_for_download_sbt /tmp/artifacts/sbt-0.13.13.tgz && \
+    bash -x /opt/app-root/check_for_download_scala /tmp/artifacts/scala-2.11.8.tgz && \
+    tar -zxf /tmp/artifacts/sbt-0.13.13.tgz -C /opt && \
+    ln -s /opt/sbt-launcher-packaging-0.13.13 /opt/sbt && \
+    tar -zxf /tmp/artifacts/scala-2.11.8.tgz -C /opt && \
+    ln -s /opt/scala-2.11.8 /opt/scala && \
+    mkdir /tmp/.ivy2 /tmp/.sbt && \
+    /opt/sbt/bin/sbt
+
+RUN rm -rf /tmp/scripts
+USER root
+RUN rm -rf /tmp/artifacts
+
+# - In order to drop the root user, we have to make some directories world
+#   writable as OpenShift default security model is to run the container
+#   under random UID.
+RUN chown -R 1001:0 /opt/app-root && \
+    chown -R 1001:0 /opt/sbt && \
+    chown -R 1001:0 /opt/scala && \
+    chmod g+rw /opt/sbt/conf && \
+    chown -R 1001:0 /tmp/.ivy2 && \
+    chmod g+rw /tmp/.ivy2 && \
+    chown -R 1001:0 /tmp/.sbt && \
+    chmod g+rw /tmp/.sbt  
+
+# Specify the working directory
+WORKDIR /tmp
+
+ENTRYPOINT ["/entrypoint"]
+
+CMD ["/launch.sh"]
+
+USER 185
