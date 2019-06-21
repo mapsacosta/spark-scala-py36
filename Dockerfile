@@ -1,5 +1,4 @@
-# This image provides a Scala 2.11.8 environment you can use to run your Scala
-# This image provides a Scala 2.11.8 environment you can use to run your Scala
+# This image provides a Spark 2.4.0 + Python3.6 + Scala 2.11.8 environment
 # Copyright 2017 Red Hat
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -16,7 +15,7 @@
 #
 # ------------------------------------------------------------------------
 #
-# This is a Dockerfile for the radanalyticsio/openshift-spark:2.4-latest image.
+# This is a Dockerfile for the mapsacosta/spark-scala-py36:2.4.0 image
 
 FROM centos:latest
 
@@ -45,8 +44,6 @@ ENV \
     STI_SCRIPTS_PATH="/usr/libexec/s2i" \ 
     SCALA_VERSION=2.11.8 \
     PATH=$HOME/.local/bin:/opt/scala/bin:/opt/sbt/bin:$PATH
-
-
 
 # Labels
 LABEL \
@@ -80,6 +77,8 @@ RUN [ "bash", "-x", "/tmp/scripts/s2i/install" ]
 USER root
 RUN [ "bash", "-x", "/tmp/scripts/python36/install" ]
 
+#Install sbt and Scala
+
 USER root
 RUN bash -x /opt/app-root/check_for_download_sbt /tmp/artifacts/sbt-0.13.13.tgz && \
     bash -x /opt/app-root/check_for_download_scala /tmp/artifacts/scala-2.11.8.tgz && \
@@ -89,6 +88,8 @@ RUN bash -x /opt/app-root/check_for_download_sbt /tmp/artifacts/sbt-0.13.13.tgz 
     ln -s /opt/scala-2.11.8 /opt/scala && \
     mkdir /tmp/.ivy2 /tmp/.sbt && \
     /opt/sbt/bin/sbt
+
+#Some cleanup..
 
 RUN rm -rf /tmp/scripts
 USER root
