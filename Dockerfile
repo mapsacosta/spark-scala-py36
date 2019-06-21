@@ -15,7 +15,7 @@
 #
 # ------------------------------------------------------------------------
 #
-# This is a Dockerfile for the mapsacosta/spark-scala-py36:2.4.0 image
+# This is a Dockerfile for the mapsacosta/spark-scala-py36:2.4.0 image: docker pull mapsacosta/spark-scala-py36:2.4.0
 
 FROM centos:latest
 
