@@ -22,7 +22,7 @@ FROM centos:latest
 USER root
 
 # Install required RPMs and ensure that the packages were installed
-RUN yum install -y java-1.8.0-openjdk wget \
+RUN yum install -y java-1.8.0-openjdk wget which \
     && yum clean all && rm -rf /var/cache/yum \
     && rpm -q java-1.8.0-openjdk wget
 
@@ -49,7 +49,7 @@ ENV \
 LABEL \
       io.cekit.version="2.2.7"  \
       io.openshift.s2i.scripts-url="image:///usr/libexec/s2i"  \
-      maintainer="Maria A. <macosta@fnal.gov>"  \
+      maintainer="Maria A. <macosta[at]fnal.gov>"  \
       name="mapsacosta/openshift-spark"  \
       org.concrt.version="2.2.7"  \
       sparkversion="2.4.0"  \
@@ -89,12 +89,6 @@ RUN bash -x /opt/app-root/check_for_download_sbt /tmp/artifacts/sbt-0.13.13.tgz 
     mkdir /tmp/.ivy2 /tmp/.sbt && \
     /opt/sbt/bin/sbt
 
-#Some cleanup..
-
-RUN rm -rf /tmp/scripts
-USER root
-RUN rm -rf /tmp/artifacts
-
 # - In order to drop the root user, we have to make some directories world
 #   writable as OpenShift default security model is to run the container
 #   under random UID.
@@ -106,6 +100,36 @@ RUN chown -R 1001:0 /opt/app-root && \
     chmod g+rw /tmp/.ivy2 && \
     chown -R 1001:0 /tmp/.sbt && \
     chmod g+rw /tmp/.sbt  
+
+#Installing (Apache Arrow + gcc)
+WORKDIR /
+
+USER root
+ENV ARROW_HOME=/usr/local
+ENV PARQUET_HOME=/usr/local
+
+RUN [ "bash", "-x", "/tmp/scripts/coffea/install" ]
+
+#Some cleanup
+RUN rm -rf /tmp/scripts
+USER root
+RUN rm -rf /tmp/artifacts
+
+#Additional python libs
+RUN pip3 install --no-cache-dir --upgrade pip
+RUN pip3 install --no-cache-dir py4j
+RUN pip3 install --no-cache-dir scipy
+RUN pip3 install --no-cache-dir jinja2
+RUN pip3 install --no-cache-dir cloudpickle
+RUN pip3 install --no-cache-dir lz4
+
+#Installing llvm from yum
+RUN yum install -y devtoolset-7 llvm-toolset-7 \
+    && yum install -y llvm-toolset-7-clang-analyzer llvm-toolset-7-clang-tools-extra # optional
+
+#Finish up with numba and coffea install
+RUN pip3 install --no-cache-dir numba
+RUN pip3 install --no-cache-dir coffea
 
 # Specify the working directory
 WORKDIR /tmp
