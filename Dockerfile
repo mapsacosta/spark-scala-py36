@@ -101,6 +101,8 @@ RUN chown -R 1001:0 /opt/app-root && \
     chown -R 1001:0 /tmp/.sbt && \
     chmod g+rw /tmp/.sbt  
 
+RUN pip3 install --no-cache-dir pyspark==2.4.0
+
 #Some cleanup
 RUN rm -rf /tmp/scripts
 USER root
