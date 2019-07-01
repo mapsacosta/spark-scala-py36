@@ -122,6 +122,7 @@ RUN pip3 install --no-cache-dir scipy
 RUN pip3 install --no-cache-dir jinja2
 RUN pip3 install --no-cache-dir cloudpickle
 RUN pip3 install --no-cache-dir lz4
+RUN pip3 install --no-cache-dir pyspark==2.4.0
 
 #Installing llvm from yum
 RUN yum install -y devtoolset-7 llvm-toolset-7 \
