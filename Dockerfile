@@ -29,9 +29,9 @@ RUN yum install -y java-1.8.0-openjdk wget which \
 
 # Add all artifacts to the /tmp/artifacts
 # directory
-COPY spark-2.4.0-bin-hadoop2.7.tgz /tmp/artifacts/
+COPY spark-2.4.3-bin-hadoop2.7.tgz /tmp/artifacts/
 COPY sbt-0.13.13.tgz /tmp/artifacts/
-COPY scala-2.11.8.tgz /tmp/artifacts/
+COPY scala-2.12.0.tgz /tmp/artifacts/
 
 # Environment variables
 ENV \
@@ -42,7 +42,7 @@ ENV \
     SPARK_HOME="/opt/spark" \
     SPARK_INSTALL="/opt/spark-distro" \
     STI_SCRIPTS_PATH="/usr/libexec/s2i" \ 
-    SCALA_VERSION=2.11.8 \
+    SCALA_VERSION=2.12.0 \
     PATH=$HOME/.local/bin:/opt/scala/bin:/opt/sbt/bin:$PATH
 
 # Labels
@@ -52,8 +52,8 @@ LABEL \
       maintainer="Maria A. <macosta[at]fnal.gov>"  \
       name="mapsacosta/openshift-spark"  \
       org.concrt.version="2.2.7"  \
-      sparkversion="2.4.0"  \
-      version="2.4-latest" 
+      sparkversion="2.4.3"  \
+      version="2.4.0-latest" 
 
 # Add scripts used to configure the image
 COPY modules /tmp/scripts
@@ -81,11 +81,11 @@ RUN [ "bash", "-x", "/tmp/scripts/python36/install" ]
 
 USER root
 RUN bash -x /opt/app-root/check_for_download_sbt /tmp/artifacts/sbt-0.13.13.tgz && \
-    bash -x /opt/app-root/check_for_download_scala /tmp/artifacts/scala-2.11.8.tgz && \
+    bash -x /opt/app-root/check_for_download_scala /tmp/artifacts/scala-2.12.0.tgz && \
     tar -zxf /tmp/artifacts/sbt-0.13.13.tgz -C /opt && \
     ln -s /opt/sbt-launcher-packaging-0.13.13 /opt/sbt && \
-    tar -zxf /tmp/artifacts/scala-2.11.8.tgz -C /opt && \
-    ln -s /opt/scala-2.11.8 /opt/scala && \
+    tar -zxf /tmp/artifacts/scala-2.12.0.tgz -C /opt && \
+    ln -s /opt/scala-2.12.0.tgz /opt/scala && \
     mkdir /tmp/.ivy2 /tmp/.sbt && \
     /opt/sbt/bin/sbt
 
@@ -101,7 +101,7 @@ RUN chown -R 1001:0 /opt/app-root && \
     chown -R 1001:0 /tmp/.sbt && \
     chmod g+rw /tmp/.sbt  
 
-RUN pip3 install --no-cache-dir pyspark==2.4.0
+RUN pip3 install --no-cache-dir pyspark==2.4.3
 
 #Some cleanup
 RUN rm -rf /tmp/scripts
