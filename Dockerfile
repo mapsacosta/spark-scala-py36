@@ -103,10 +103,35 @@ RUN chown -R 1001:0 /opt/app-root && \
 
 RUN pip3 install --no-cache-dir pyspark==2.4.3
 
+#Installing (Apache Arrow + gcc)
+WORKDIR /
+
+USER root
+ENV ARROW_HOME=/usr/local
+ENV PARQUET_HOME=/usr/local
+
+RUN [ "bash", "-x", "/tmp/scripts/coffea/install" ]
+
 #Some cleanup
 RUN rm -rf /tmp/scripts
 USER root
 RUN rm -rf /tmp/artifacts
+
+#Additional python libs
+RUN pip3 install --no-cache-dir --upgrade pip
+RUN pip3 install --no-cache-dir py4j
+RUN pip3 install --no-cache-dir scipy
+RUN pip3 install --no-cache-dir jinja2
+RUN pip3 install --no-cache-dir cloudpickle
+RUN pip3 install --no-cache-dir lz4
+
+#Installing llvm from yum
+RUN yum install -y devtoolset-7 llvm-toolset-7 \
+    && yum install -y llvm-toolset-7-clang-analyzer llvm-toolset-7-clang-tools-extra # optional
+
+#Finish up with numba and coffea install
+RUN pip3 install --no-cache-dir numba
+RUN pip3 install --no-cache-dir coffea
 
 # Specify the working directory
 WORKDIR /tmp

@@ -1,0 +1,5 @@
+schema_version: 1
+
+name: coffea
+execute:
+    - script: install
