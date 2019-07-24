@@ -77,6 +77,11 @@ RUN [ "bash", "-x", "/tmp/scripts/s2i/install" ]
 USER root
 RUN [ "bash", "-x", "/tmp/scripts/python36/install" ]
 
+#Put hadoop in
+
+RUN wget https://archive.apache.org/dist/hadoop/core/hadoop-2.7.2/hadoop-2.7.2.tar.gz && tar xvf hadoop-2.7.2.tar.gz  -C /opt/
+COPY modules/hadoop/* /opt/hadoop-2.7.2/etc/hadoop/
+
 #Install sbt and Scala
 
 USER root
@@ -132,6 +137,36 @@ RUN yum install -y devtoolset-7 llvm-toolset-7 \
 #Finish up with numba and coffea install
 RUN pip3 install --no-cache-dir numba
 RUN pip3 install --no-cache-dir coffea
+
+#Setting up aliases
+RUN echo -e '#!/bin/bash\n/opt/hadoop-2.7.2/bin/hadoop' > /usr/bin/hadoop && \
+    chmod +x /usr/bin/hadoop
+
+RUN echo -e '#!/bin/bash\n/opt/hadoop-2.7.2/bin/hdfs' > /usr/bin/hdfs && \
+    chmod +x /usr/bin/hdfs
+
+#Initializing Hadoop/Spark environment
+ENV PYSPARK_PYTHON="python3.6"
+ENV PATH="/opt/hadoop-2.7.3/bin:$PATH"
+
+ENV SPARK_HOME="/opt/spark"
+ENV PATH="$SPARK_HOME/bin:$PATH"
+ENV SPARK_DIST_CLASSPATH="$(hadoop classpath)"
+
+ENV HADOOP_HOME="/opt/hadoop-2.7.2"
+ENV HADOOP_CLASSPATH="$HADOOP_HOME/libexec"
+ENV PATH="$PATH:$HADOOP_HOME/bin:$JAVA_PATH/bin:$HADOOP_HOME/sbin"
+ENV HADOOP_PREFIX="/opt/hadoop-2.7.2"
+ENV HADOOP_MAPRED_HOME="${HADOOP_HOME}"
+ENV HADOOP_COMMON_HOME="${HADOOP_HOME}"
+ENV HADOOP_HDFS_HOME="${HADOOP_HOME}"
+ENV YARN_HOME="${HADOOP_HOME}"
+ENV HADOOP_CONF_DIR="${HADOOP_HOME}/etc/hadoop"
+ENV HADOOP_COMMON_LIB_NATIVE_DIR="${HADOOP_PREFIX}/lib/native"
+ENV HADOOP_OPTS="$HADOOP_OPTS -Djava.library.path=$HADOOP_HOME/lib/native"
+
+ENV HADOOP_CLASSPATH="/opt/hadoop-xrootd/*:$(hadoop classpath)"
+ENV LD_LIBRARY_PATH="$HADOOP_HOME/lib/native/:$LD_LIBRARY_PATH"
 
 # Specify the working directory
 WORKDIR /tmp
