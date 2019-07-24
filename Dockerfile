@@ -77,6 +77,11 @@ RUN [ "bash", "-x", "/tmp/scripts/s2i/install" ]
 USER root
 RUN [ "bash", "-x", "/tmp/scripts/python36/install" ]
 
+#Put hadoop in
+
+RUN wget https://archive.apache.org/dist/hadoop/core/hadoop-2.7.2/hadoop-2.7.2.tar.gz && tar xvf hadoop-2.7.2.tar.gz  -C /opt/
+COPY modules/hadoop/* /opt/hadoop-2.7.2/etc/hadoop/
+
 #Install sbt and Scala
 
 USER root
@@ -103,10 +108,65 @@ RUN chown -R 1001:0 /opt/app-root && \
 
 RUN pip3 install --no-cache-dir pyspark==2.4.3
 
+#Installing (Apache Arrow + gcc)
+WORKDIR /
+
+USER root
+ENV ARROW_HOME=/usr/local
+ENV PARQUET_HOME=/usr/local
+
+RUN [ "bash", "-x", "/tmp/scripts/coffea/install" ]
+
 #Some cleanup
 RUN rm -rf /tmp/scripts
 USER root
 RUN rm -rf /tmp/artifacts
+
+#Additional python libs
+RUN pip3 install --no-cache-dir --upgrade pip
+RUN pip3 install --no-cache-dir py4j
+RUN pip3 install --no-cache-dir scipy
+RUN pip3 install --no-cache-dir jinja2
+RUN pip3 install --no-cache-dir cloudpickle
+RUN pip3 install --no-cache-dir lz4
+
+#Installing llvm from yum
+RUN yum install -y devtoolset-7 llvm-toolset-7 \
+    && yum install -y llvm-toolset-7-clang-analyzer llvm-toolset-7-clang-tools-extra # optional
+
+#Finish up with numba and coffea install
+RUN pip3 install --no-cache-dir numba
+RUN pip3 install --no-cache-dir coffea
+
+#Setting up aliases
+RUN echo -e '#!/bin/bash\n/opt/hadoop-2.7.2/bin/hadoop' > /usr/bin/hadoop && \
+    chmod +x /usr/bin/hadoop
+
+RUN echo -e '#!/bin/bash\n/opt/hadoop-2.7.2/bin/hdfs' > /usr/bin/hdfs && \
+    chmod +x /usr/bin/hdfs
+
+#Initializing Hadoop/Spark environment
+ENV PYSPARK_PYTHON="python3.6"
+ENV PATH="/opt/hadoop-2.7.3/bin:$PATH"
+
+ENV SPARK_HOME="/opt/spark"
+ENV PATH="$SPARK_HOME/bin:$PATH"
+ENV SPARK_DIST_CLASSPATH="$(hadoop classpath)"
+
+ENV HADOOP_HOME="/opt/hadoop-2.7.2"
+ENV HADOOP_CLASSPATH="$HADOOP_HOME/libexec"
+ENV PATH="$PATH:$HADOOP_HOME/bin:$JAVA_PATH/bin:$HADOOP_HOME/sbin"
+ENV HADOOP_PREFIX="/opt/hadoop-2.7.2"
+ENV HADOOP_MAPRED_HOME="${HADOOP_HOME}"
+ENV HADOOP_COMMON_HOME="${HADOOP_HOME}"
+ENV HADOOP_HDFS_HOME="${HADOOP_HOME}"
+ENV YARN_HOME="${HADOOP_HOME}"
+ENV HADOOP_CONF_DIR="${HADOOP_HOME}/etc/hadoop"
+ENV HADOOP_COMMON_LIB_NATIVE_DIR="${HADOOP_PREFIX}/lib/native"
+ENV HADOOP_OPTS="$HADOOP_OPTS -Djava.library.path=$HADOOP_HOME/lib/native"
+
+ENV HADOOP_CLASSPATH="/opt/hadoop-xrootd/*:$(hadoop classpath)"
+ENV LD_LIBRARY_PATH="$HADOOP_HOME/lib/native/:$LD_LIBRARY_PATH"
 
 # Specify the working directory
 WORKDIR /tmp
