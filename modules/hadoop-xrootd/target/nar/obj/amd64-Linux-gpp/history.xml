@@ -1,0 +1,11 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<history>
+   <processor signature=" g++ 4.8.5 x86_64-redhat-linux -std=c++0x -Wall -Wno-long-long -Wpointer-arith -Wconversion -fPIC -c -fPIC -DLinux -DGNU_GCC -Itarget/nar/javah-include -I../../usr/lib/jvm/java-1.8.0-openjdk-1.8.0.212.b04-0.el7_6.x86_64/include -I../../usr/lib/jvm/java-1.8.0-openjdk-1.8.0.212.b04-0.el7_6.x86_64/include/linux">
+      <target file="ch_cern_eos_XRootDFileSystem.2460f423.o" lastModified="16c01c54fe0">
+         <source file="../../../../src/main/cpp/ch_cern_eos_XRootDFileSystem.cpp" lastModified="16c01b27f78"/>
+      </target>
+      <target file="ch_cern_eos_XRootDClFile.7f81635d.o" lastModified="16c01c54bf8">
+         <source file="../../../../src/main/cpp/ch_cern_eos_XRootDClFile.cpp" lastModified="16c01b27f78"/>
+      </target>
+   </processor>
+</history>

@@ -1,0 +1,13 @@
+ch/cern/eos/XRootDKrb5FileSystem.class
+ch/cern/eos/NarSystem.class
+ch/cern/eos/XRootDInstrumentation.class
+ch/cern/eos/Krb5TokenRenewer.class
+ch/cern/eos/XRootDOutputStream.class
+ch/cern/eos/XRootDInputStream.class
+ch/cern/eos/XRootDClFile.class
+ch/cern/eos/XRootDFileSystem.class
+ch/cern/eos/DebugLogger.class
+ch/cern/eos/XRootDConfiguration.class
+ch/cern/eos/Krb5TokenIdentifier.class
+ch/cern/eos/XRootDKrb5.class
+ch/cern/eos/XRootDConstants.class

@@ -1,0 +1,13 @@
+/root/hadoop-xrootd/src/main/java/ch/cern/eos/XRootDKrb5.java
+/root/hadoop-xrootd/target/nar/nar-generated/ch/cern/eos/NarSystem.java
+/root/hadoop-xrootd/src/main/java/ch/cern/eos/XRootDKrb5FileSystem.java
+/root/hadoop-xrootd/src/main/java/ch/cern/eos/Krb5TokenRenewer.java
+/root/hadoop-xrootd/src/main/java/ch/cern/eos/XRootDInstrumentation.java
+/root/hadoop-xrootd/src/main/java/ch/cern/eos/XRootDInputStream.java
+/root/hadoop-xrootd/src/main/java/ch/cern/eos/XRootDOutputStream.java
+/root/hadoop-xrootd/src/main/java/ch/cern/eos/XRootDConfiguration.java
+/root/hadoop-xrootd/src/main/java/ch/cern/eos/DebugLogger.java
+/root/hadoop-xrootd/src/main/java/ch/cern/eos/XRootDClFile.java
+/root/hadoop-xrootd/src/main/java/ch/cern/eos/XRootDConstants.java
+/root/hadoop-xrootd/src/main/java/ch/cern/eos/Krb5TokenIdentifier.java
+/root/hadoop-xrootd/src/main/java/ch/cern/eos/XRootDFileSystem.java
