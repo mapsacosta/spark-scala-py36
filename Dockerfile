@@ -140,7 +140,9 @@ COPY modules/hadoop-xrootd/* /opt/hadoop-xrootd/
 ENV HADOOP_CLASSPATH="/opt/hadoop-xrootd/*:$(hadoop classpath)"
 
 #Installing xrootd requirements for HDFS connector
-RUN yum -y install xrootd-client xrootd-client-libs xrootd-client-devel
+RUN yum -y install xrootd-client xrootd-client-libs xrootd-client-devel && yum clean all \
+ && wget -P /opt http://download-ib01.fedoraproject.org/pub/epel/7/x86_64/Packages/p/python34-xrootd-4.10.0-1.el7.x86_64.rpm \
+ && yum -y --nogpgcheck localinstall /opt/python34-xrootd-4.10.0-1.el7.x86_64.rpm
 
 #Installing OSG libs/CAs (WN client for now but we can prob get rid of a lot of this) 
 RUN yum -y install https://repo.opensciencegrid.org/osg/3.4/osg-3.4-el7-release-latest.rpm \
