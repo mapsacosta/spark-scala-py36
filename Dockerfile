@@ -103,6 +103,7 @@ RUN pip3 install --no-cache-dir scipy
 RUN pip3 install --no-cache-dir jinja2 
 RUN pip3 install --no-cache-dir cloudpickle 
 RUN pip3 install --no-cache-dir lz4
+RUN pip3 install --no-cache-dir blosc
 
 RUN pip install --no-cache-dir pyarrow==0.10.0
 RUN pip install --no-cache-dir numba
