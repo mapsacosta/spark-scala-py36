@@ -95,4 +95,4 @@ case "$SPARK_K8S_CMD" in
     exit 1
 esac
 
-exec "${CMD[@]}"
+exec env ENV_SPARK_EXECUTOR_ID=$SPARK_EXECUTOR_ID env ENV_SPARK_APPLICATION_ID=$SPARK_APPLICATION_ID "${CMD[@]}"
